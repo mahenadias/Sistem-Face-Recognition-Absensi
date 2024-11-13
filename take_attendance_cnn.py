@@ -49,7 +49,7 @@ def record_attendance_json(name, user_id, major, full_frame):
     with open(file_path, 'w') as f:
         json.dump(attendance_data, f)
 
-def predict_face(face, model, users, threshold=0.8, confidence_threshold=0.8):  
+def predict_face(face, model, users, threshold=0.6, confidence_threshold=0):  
     face = cv2.resize(face, (64, 64))  
     face = cv2.cvtColor(face, cv2.COLOR_BGR2GRAY)
     face = face.astype('float32') / 255.0

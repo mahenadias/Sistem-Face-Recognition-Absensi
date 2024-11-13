@@ -1,6 +1,6 @@
 import os
 import pickle
-import time  # Import modul time untuk menambahkan jeda
+import time
 
 import cv2
 import dlib
@@ -18,7 +18,7 @@ def load_existing_data():
         with open('data/users.pkl', 'rb') as f:
             users = pickle.load(f)
     else:
-        faces_data = []  # Initialize as empty if no data found
+        faces_data = []
         users = []
     return faces_data, users
 
@@ -28,7 +28,7 @@ def capture_face_data(cap, face_cascade, predictor, num_frames, instruction, wai
     face_samples = []
     FRAME_WINDOW = st.image([])
 
-    time.sleep(wait_time)  # Jeda sebelum memulai pengambilan frame
+    time.sleep(wait_time)
     while frames_collected < num_frames:
         ret, frame = cap.read()
         if not ret:
@@ -58,22 +58,23 @@ def capture_face_data(cap, face_cascade, predictor, num_frames, instruction, wai
 def main():
     st.title("Tambah Wajah Baru ke Dataset")
 
-    # Input user info
     name = st.text_input("Masukkan Nama:")
     user_id = st.text_input("Masukkan NIM:")
     major = st.text_input("Masukkan Prodi:")
+
     add_face_button = st.button("Tambah Wajah")
+    train_model_button = st.button("Latih Model CNN")
+
+    # Memuat data wajah dan pengguna yang sudah ada
+    faces_data, users = load_existing_data()
 
     if add_face_button and name and user_id and major:
         cap = cv2.VideoCapture(1)
         face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
         predictor = dlib.shape_predictor("data/shape_predictor_68_face_landmarks.dat")
 
-        faces_data, users = load_existing_data()
-
         total_face_samples = []
 
-        # Capture data for different orientations with a 3-second wait between orientations
         orientations = [
             "Tolong menghadap depan.",
             "Tolong menghadap kanan.",
@@ -96,23 +97,30 @@ def main():
         # Tambahkan user baru ke data pengguna yang sudah ada
         users.append({'name': name, 'user_id': user_id, 'major': major})
 
+        # Simpan data wajah dan pengguna
         with open('data/faces_data.pkl', 'wb') as f:
             pickle.dump(faces_data, f)
 
         with open('data/users.pkl', 'wb') as f:
             pickle.dump(users, f)
 
-        st.write("Melatih model CNN...")
+        st.success("Data wajah berhasil disimpan. Silakan tambahkan wajah baru atau latih model.")
 
-        # Muat dan siapkan data untuk pelatihan tanpa split validasi
-        faces_data = load_data()
-        X_train, y_train = prepare_data(faces_data, validation_split=False)
-        num_classes = len(set(y_train))
+    if train_model_button:
+        if faces_data and users:
+            st.write("Melatih model CNN...")
+            
+            # Muat dan siapkan data untuk pelatihan tanpa split validasi
+            faces_data = load_data()
+            X_train, y_train = prepare_data(faces_data, validation_split=False)
+            num_classes = len(set(y_train))
 
-        # Latih dan simpan model dengan hanya data pelatihan
-        train_and_save_model(X_train, y_train, None, None, num_classes)
+            # Latih dan simpan model dengan hanya data pelatihan
+            train_and_save_model(X_train, y_train, None, None, num_classes)
 
-        st.success("Model CNN berhasil dilatih dan disimpan.")
+            st.success("Model CNN berhasil dilatih dan disimpan.")
+        else:
+            st.warning("Tidak ada data wajah yang tersedia. Tambahkan wajah terlebih dahulu sebelum melatih model.")
 
 if __name__ == '__main__':
     main()

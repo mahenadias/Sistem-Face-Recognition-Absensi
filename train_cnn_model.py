@@ -68,7 +68,7 @@ def build_model(num_classes):
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
     return model
 
-def train_and_save_model(X_train, y_train, X_val, y_val, num_classes, epochs=20, batch_size=32):
+def train_and_save_model(X_train, y_train, X_val, y_val, num_classes, epochs=10, batch_size=32):
     """Melatih model CNN dengan data augmentation dan menyimpannya dalam file .h5."""
     model = build_model(num_classes)
     print("Mulai pelatihan model CNN...")
