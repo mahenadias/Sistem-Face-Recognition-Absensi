@@ -109,8 +109,8 @@ def take_attendance():
     st.write("Aktifkan kamera untuk melakukan absensi.")
 
     # Tetapkan nilai default threshold tanpa slider
-    threshold = 0.8
-    confidence_threshold = 0.8
+    threshold = 0.7
+    confidence_threshold = 0.6
 
     model, users = load_model_and_data()
 
